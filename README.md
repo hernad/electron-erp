@@ -1,13 +1,5 @@
 # electron-erp
 
-Jaewe Heo
-
-## Based on electron-starterify
-
-:electric_plug: [Electron][electron] application skeleton based on [React][react]
-
-
-https://github.com/importre/electron-starterify
 
 
 ## Usage
@@ -36,6 +28,13 @@ $ gulp watch
   ```
 
 3. See `./release` directory
+
+
+## Based on electron-starterifyv (Jaewe Heo)
+
+:electric_plug: [Electron][electron] application skeleton based on [React][react]
+
+https://github.com/importre/electron-starterify
 
 
 ## Troubleshooting

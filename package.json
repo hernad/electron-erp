@@ -14,12 +14,12 @@
     "electron",
     "react"
   ],
-  "author": "Jaewe Heo",
+  "author": "Ernad Husremovic",
   "license": "BSD",
   "bugs": {
-    "url": "https://github.com/importre/electron-starterify/issues"
+    "url": "https://github.com/hernad/electron-erp/issues"
   },
-  "homepage": "https://github.com/importre/electron-starterify#readme",
+  "homepage": "https://github.com/hernad/electron-erp#readme",
   "dependencies": {
     "pg": "^4.3.0",
     "react": "^0.13.3",

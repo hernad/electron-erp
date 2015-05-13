@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const app = require('app');
 const BrowserWindow = require('browser-window');
@@ -326,4 +326,5 @@ app.on('ready', function () {
     // for multiple windows store them in an array
     mainWindow = null;
   });
+
 });

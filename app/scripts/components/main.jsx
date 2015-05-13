@@ -2,10 +2,10 @@ import React from 'react'
 //import ipc from 'ipc'
 
 function load() {
-
+  'use strict';
   //alert('load email');
   //window.location.replace("http://localhost:8000");
-  
+
   alert('pingaj konzolu');
   console.log(ipc.sendSync('synchronous-message', 'ping')); // prints "pong"
 
@@ -19,13 +19,15 @@ function load() {
 let Main = React.createClass({
 
    componentDidMount: function() {
+     'use strict';
 
-  var container = document.getElementById('adv_example');
-  var percentRenderer = function (instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.renderers.NumericRenderer.apply(this, arguments);
-    td.style.color = (value < 0) ? 'red' : 'green';
+     var container = document.getElementById('adv_example');
+     var percentRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+     Handsontable.renderers.NumericRenderer.apply(this, arguments);
+     td.style.color = (value < 0) ? 'red' : 'green';
+     
   };
-  
+
   var advancedData = [
     ["Afghanistan","30.552","1000s","2013","0.0244","27.708","24.019","11.215"],
     ["Albania","2.774","1000s","2013","-0.0100","2.884","3.015","3.228"],
@@ -107,7 +109,7 @@ let Main = React.createClass({
     ["Zimbabwe","14.15","1000s","2013","0.0310","12.889","12.693","10.167"],
     ["Zimbabwe","14.15","1000s","2013","0.0310","12.889","12.693","10.167"]
   ];
-  
+
   var hot = new Handsontable(container, {
     data: advancedData,
     height: 396,
@@ -128,20 +130,20 @@ let Main = React.createClass({
       {data: 6, type: 'numeric', format: '0,0.00[0000]'}
     ]
   });
-  
-  
+
+
 
   },
 
   render: function () {
     var divId = "adv_example";
-    return ( 
+    return (
       <div>
         <h1>electron-starterify</h1>
         Hello, <b>Electron</b>
         <pre/>Ernad Husremović
         <pre/>
-        <button onClick={load}>nuclear email</button>
+      <button onClick={load}>call load funkciju</button>
         <div id={divId} />
       </div>
 

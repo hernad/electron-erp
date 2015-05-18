@@ -22,7 +22,7 @@ var connectionString = process.env.DATABASE_URL || 'postgres://f18-db.bring.out.
 console.log( "connection string:", connectionString);
 
 // Get a Postgres client from the connection pool
-pg.connect(connectionString, function(err, client, done) {
+true || pg.connect(connectionString, function(err, client, done) {
 
         var results = [];
         var query = client.query("SELECT * from fmk.roba WHERE id>($1)", ['']);
@@ -76,6 +76,20 @@ app.on('ready', function () {
     });
   } catch (e) {
   }
+
+
+  var githubBugs = {
+        label: 'Prijava bug-a na github',
+         click: function () {
+              var issuesWindow = new BrowserWindow({
+                  width: 1024, height: 768, resizable: true, show: true
+              });
+              issuesWindow.loadUrl( 'https://github.com/hernad/electron-erp/issues' );
+              //require('shell').openExternal('https://github.com/atom/electron/issues')
+         }
+  };
+
+
 
   if (process.platform == 'darwin') {
     var darwinTmpl = [
@@ -209,7 +223,7 @@ app.on('ready', function () {
         ]
       },
       {
-        label: 'Help',
+        label: 'Pomoć',
         submenu: [
           {
             label: 'Learn More',
@@ -229,12 +243,7 @@ app.on('ready', function () {
               require('shell').openExternal('https://discuss.atom.io/c/electron')
             }
           },
-          {
-            label: 'Search Issues',
-            click: function () {
-              require('shell').openExternal('https://github.com/atom/electron/issues')
-            }
-          }
+          githubBugs
         ]
       }
     ];
@@ -306,12 +315,7 @@ app.on('ready', function () {
               require('shell').openExternal('https://discuss.atom.io/c/electron')
             }
           },
-          {
-            label: 'Search Issues',
-            click: function () {
-              require('shell').openExternal('https://github.com/atom/electron/issues')
-            }
-          }
+          githubBugs
         ]
       }
     ];

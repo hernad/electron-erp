@@ -30,7 +30,7 @@ gulp.task('clean', function (cb) {
 });
 
 gulp.task('copy', function () {
-  return gulp.src(['app/index.html', 'app/index.js', 'package.json'])
+  return gulp.src(['app/index.html', 'app/index.js', 'package.json', 'terminal.html', 'node_modules/terminal.js/dist/terminal.js', 'node_modules/socket.io-stream/socket.io-stream.js' ] )
     .pipe(gulp.dest('dist/app'));
 });
 

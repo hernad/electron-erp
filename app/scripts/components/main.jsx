@@ -96,17 +96,6 @@ let Main = React.createClass({
     ["Serbia","7.164","1000s","2013","-0.0049","7.321","7.463","n.a."],
     ["Seychelles","89","1000s","2013","0.0099","87","82","69"],
     ["Uganda","37.579","1000s","2013","0.0339","32.864","27.767","16.923"],
-    ["UK","64.097","1000s","2013","0.0063","62.276","59.988","57.077"],
-    ["Ukraine","45.49","1000s","2013","-0.0023","46.053","47.452","51.773"],
-    ["Uruguay","3.407","1000s","2013","0.0035","3.36","3.324","3.089"],
-    ["USA","316.129","1000s","2013","0.0072","306.772","292.805","246.819"],
-    ["Uzbekistan","30.241","1000s","2013","0.0157","27.767","25.864","20.077"],
-    ["Vanuatu","253","1000s","2013","0.0222","231","204","143"],
-    ["Venezuela","30.405","1000s","2013","0.0150","28.583","26.261","19.256"],
-    ["Vietnam","89.709","1000s","2013","0.0105","86.025","81.438","64.774"],
-    ["Yemen","24.407","1000s","2013","0.0233","22.23","19.613","11.27"],
-    ["Zambia","14.539","1000s","2013","0.0329","12.825","11.175","7.647"],
-    ["Zimbabwe","14.15","1000s","2013","0.0310","12.889","12.693","10.167"],
     ["Zimbabwe","14.15","1000s","2013","0.0310","12.889","12.693","10.167"]
   ];
 
@@ -137,16 +126,20 @@ let Main = React.createClass({
 
   render: function () {
     var divId = "adv_example";
+    var termClass = "terminaljs";
+    var columns=120;
+    var rows=30;
     return (
       <div>
-        <h1>electron-starterify</h1>
+        <h1>electron-erp</h1>
         Hello, <b>Electron</b>
-        <pre/>Ernad Husremović
-        <pre/>
-      <button onClick={load}>call load funkciju</button>
+        <pre/>Ernad Husremović<pre/>
+        We are using node.js {process.version}, kolona={columns}, redova={rows}<pre/>
+        and atom-shell xxxx<pre/>
+        <button onClick={load}>call load funkciju</button>
         <div id={divId} />
+        <pre className={termClass} data-columns={columns} data-rows={rows}></pre>
       </div>
-
     )
   }
 });

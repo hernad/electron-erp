@@ -9,9 +9,21 @@ const pg = require('pg');
 // report crashes to the Electron project
 require('crash-reporter').start();
 
+const http = require('http');
+const fs = require('fs');
+
+const termSocketio = require('socket.io');
+const child_pty = require('child_pty');
+const ss = require('socket.io-stream');
+
+var termServer = http.createServer().listen( 3000 , '127.0.0.1');
+var ptys = {};
+var termId = 1;
+
 // prevent window being GC'd
 let mainWindow = null;
 var menu = null;
+
 
 app.on('window-all-closed', function () {
   app.quit();
@@ -46,6 +58,23 @@ true || pg.connect(connectionString, function(err, client, done) {
 
 });
 
+/*
+var tty = require('tty.js');
+
+var ttyApp = tty.createServer({
+  shell: 'bash',
+  users: {
+    foo: 'bar'
+  },
+  port: 8000
+});
+
+ttyApp.get('/foo', function(req, res, next) {
+  res.send('bar');
+});
+
+ttyApp.listen();
+*/
 
 ipc.on('asynchronous-message', function(event, arg) {
   console.log(arg);  // prints "ping"
@@ -59,6 +88,7 @@ ipc.on('synchronous-message', function(event, arg) {
 
 
 app.on('ready', function () {
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 768,
@@ -85,19 +115,35 @@ app.on('ready', function () {
                   width: 1024, height: 768, resizable: true, show: true
               });
               issuesWindow.loadUrl( 'https://github.com/hernad/electron-erp/issues' );
-              //require('shell').openExternal('https://github.com/atom/electron/issues')
          }
   };
 
 
-  var terminalWindow = {
+  var terminalMenuItem = {
         label: 'Terminal',
          click: function () {
               var terminalWindow = new BrowserWindow({
-                  width: 1280, height: 768, resizable: true, show: true
+                  width: 1280, height: 768, resizable: true, show: true, win_id: termId
               });
+              console.log( "terminal window", termId );
+              termId++;
               terminalWindow.loadUrl( 'http://127.0.0.1:3000' );
-         }
+              terminalWindow.on( 'close',  function() {
+
+                   //var dialog = require( 'dialog' );
+                   //dialog.showOpenDialog({ properties: [ 'openFile', 'openDirectory', 'multiSelections' ]});
+
+	           var k = Object.keys(ptys);
+                   console.log( Object.keys(ptys) );
+	           var i;
+
+	           for(i = 0; i < k.length; i++) {
+		       ptys[k].kill('SIGHUP');
+		       delete ptys[k];
+	           }
+                   console.log( `SIGHUP za sve terminale (${k.length}) !`);
+              });
+         },
   };
 
 
@@ -213,7 +259,7 @@ app.on('ready', function () {
       {
         label: 'Window',
         submenu: [
-          terminalWindow,
+          terminalMenuItem,
           {
             label: 'Minimize',
             accelerator: 'Command+M',
@@ -344,22 +390,7 @@ app.on('ready', function () {
 
 
 
-  //var config = require( `file://${__dirname}/config.json` );
-  //console.log('Listening on ' + config.interface + ':' + config.port);
-
-const http = require('http');
-const fs = require('fs');
-
-const termSocketio = require('socket.io');
-const child_pty = require('child_pty');
-const ss = require('socket.io-stream');
-
-var termServer = http.createServer()
-	.listen( 3000 , '127.0.0.1');
-
-var ptys = {};
-
-termServer.on('request', function(req, res) {
+  termServer.on('request', function(req, res) {
 		var file = null;
 		console.log(req.url);
 		switch(req.url) {
@@ -370,6 +401,9 @@ termServer.on('request', function(req, res) {
 		case '/terminal.js':
 			file = '/terminal.js';
 			break;
+		case '/socket.io.js':
+			file = '/socket.io.js';
+                        break;
 		case '/socket.io-stream.js':
 			file = '/socket.io-stream.js';
 			break;
@@ -378,34 +412,27 @@ termServer.on('request', function(req, res) {
 			res.end('404 Not Found');
 			return;
 		}
+                console.log( "dirname:", __dirname );
 		fs.createReadStream(__dirname + file).pipe(res);
 	});
 
-termSocketio(termServer).of('pty').on('connection', function(socket) {
+   termSocketio(termServer).of('pty').on('connection', function(socket) {
 	// receives a bidirectional pipe from the client see index.html
 	// for the client-side
 	ss(socket).on('new', function(stream, options) {
 		var name = options.name;
-                var cmd = "echo \"Hello from electron-erp web terminal\"; w3m https://www.google.ba"
+                var cmd = "echo \"Hello from electron-erp web terminal\"; ./test"
 
+                console.log( "terminal options:", options );
 		var pty = child_pty.spawn('/bin/sh', ['-c', cmd ], options);
 		pty.stdout.pipe(stream).pipe(pty.stdin);
 		ptys[name] = pty;
 		socket.on('disconnect', function() {
-			console.log("end");
+			console.log("socket disconnect: end");
 			pty.kill('SIGHUP');
 			delete ptys[name];
 		});
 	});
-});
-
-process.on('exit', function() {
-	var k = Object.keys(ptys);
-	var i;
-
-	for(i = 0; i < k.length; i++) {
-		ptys[k].kill('SIGHUP');
-	}
 });
 
 

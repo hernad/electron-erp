@@ -25,43 +25,31 @@ Last name:<br>
 <input type="text" name="lastname">
 </form>
 
-		<pre class="terminaljs" data-name="terminal" data-columns="120" data-rows="35"></pre>
+		<pre class="terminaljs" data-columns="120" data-rows="35"></pre>
 
 
 <script>
 var containers = document.getElementsByClassName('terminaljs'),
 	socket = io(location.origin + '/pty'), term, stream;
 
-console.log( "terminaljs containers: " + containers.length );
-console.log( "location origin: " + location.origin );
-console.log( "ss: " + ss );
+alert( "containers length: "  + containers.length );
 for(var i = 0; i < containers.length; i++) {
+
 	// setting tabindex makes the element focusable
 	containers[i].tabindex = 0;
-	// use data-* attributes to configure terminal and child_pty
+	
+        // use data-* attributes to configure terminal and child_pty
 	term = new Terminal(containers[i].dataset);
+
 	// Create bidirectional stream
-	stream = ss.createStream( {decodeStrings: false, encoding: 'utf-8'} );
-	// Send stream and options to the server
+	stream = ss.createStream({decodeStrings: false, encoding: 'utf-8'});
+	
+        // Send stream and options to the server
 	ss(socket).emit('new', stream, containers[i].dataset);
-	// Connect everything up
+	
+        // Connect everything up
 	stream.pipe(term).dom(containers[i]).pipe(stream);
-
-         
 }
-console.log("terminal end script") ;
-
-window.onbeforeunload = function(e) {
-  //console.log('I do not want to be closed');
-  // alert( 'ne mozes me zatvoriti' );
-  // Unlike usual browsers, in which a string should be returned and the user is
-  // prompted to confirm the page unload. Electron gives the power completely
-  // to the developers, return empty string or false would prevent the unloading
-  // now. You can also use the dialog API to let user confirm it.
-  //return false;
-  return true;
-};
-
 </script>
 	</body>
 </html>

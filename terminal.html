@@ -3,9 +3,13 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>terminal application</title>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="/socket.io-stream.js"></script>
-		<script src="/terminal.js"></script>
+		<script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+		<script src="http://127.0.0.1:3000/socket.io-stream.js"></script>
+		<script src="http://127.0.0.1:3000/terminal.js"></script>
+             <!--   <script src="http://requirejs.org/docs/release/2.1.17/minified/require.js"></script> -->
+
+                <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+
 		<style>
 .terminaljs {
 	background: green;
@@ -19,36 +23,57 @@
 
 <form>
 First name:<br>
-<input type="text" name="firstname">
+<input id="field01" type="text" name="firstname">
 <br>
 Last name:<br>
-<input type="text" name="lastname">
+<input id="field02" type="text" name="lastname">
 </form>
 
-		<pre class="terminaljs" data-name="terminal" data-columns="120" data-rows="35"></pre>
-
+<pre class="terminaljs" id="terminal01" data-name="terminal" data-columns="120" data-rows="35"></pre>
 
 <script>
-var containers = document.getElementsByClassName('terminaljs'),
-	socket = io(location.origin + '/pty'), term, stream;
 
-console.log( "terminaljs containers: " + containers.length );
+
+//require.config ({
+//  paths: { 
+//       'jquery': '/bower_components/jquery/dist/jquery.min'
+//   }
+//});
+
+//window.$ = window.jQuery = require( ['jquery'], function(jquery) {});
+
+
+var container = document.getElementById('terminal01');
+var field01 = document.getElementById('field01');
+var socket = io( 'http://127.0.0.1:3000/pty');
+
+var term, stream;
+
 console.log( "location origin: " + location.origin );
-console.log( "ss: " + ss );
-for(var i = 0; i < containers.length; i++) {
+console.log( "field01: " + field01 );
+//cconsole.log( "ss: " + ss );
+
 	// setting tabindex makes the element focusable
-	containers[i].tabindex = 0;
-	// use data-* attributes to configure terminal and child_pty
-	term = new Terminal(containers[i].dataset);
+	container.tabindex = 0;
+	
+        // use data-* attributes to configure terminal and child_pty
+	term = new Terminal(container.dataset);
+
 	// Create bidirectional stream
 	stream = ss.createStream( {decodeStrings: false, encoding: 'utf-8'} );
-	// Send stream and options to the server
-	ss(socket).emit('new', stream, containers[i].dataset);
-	// Connect everything up
-	stream.pipe(term).dom(containers[i]).pipe(stream);
+	
+        // Send stream and options to the server
+	ss(socket).emit('new', stream, container.dataset);
 
-         
-}
+        
+        debugger;
+ 
+        // Connect everything up
+	stream.pipe(term).dom(container).pipe(stream);
+
+        container.focus();
+        
+
 console.log("terminal end script") ;
 
 window.onbeforeunload = function(e) {
@@ -62,6 +87,16 @@ window.onbeforeunload = function(e) {
   return true;
 };
 
+jQuery("input").change( function() {
+  //console.log( "text changed" );
+  
+  var stream2 = ss.createStream();
+  ss(socket).emit('field01', stream2, { cmd: "xxxx" } );
+   
+  stream2.pipe(term).dom(field01).pipe(stream2 );	
+});
+
 </script>
-	</body>
+
+</body>
 </html>

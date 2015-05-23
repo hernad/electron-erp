@@ -30,9 +30,15 @@ gulp.task('clean', function (cb) {
 });
 
 gulp.task('copy', function () {
-  return gulp.src(['app/index.html', 'app/index.js', 'package.json', 'terminal.html', 'node_modules/terminal.js/dist/terminal.js', 'node_modules/socket.io-stream/socket.io-stream.js', 'node_modules/socket.io/node_modules/socket.io-client/socket.io.js' ] )
+  return gulp.src([ 'app/index.html', 'app/index.js', 'package.json', 'terminal.html', 'node_modules/terminal.js/dist/terminal.js', 'node_modules/socket.io-stream/socket.io-stream.js', 'node_modules/socket.io/node_modules/socket.io-client/socket.io.js', 'node_modules/electron-rebuild/node_modules/npm/html/favicon.ico'  ] )
     .pipe(gulp.dest('dist/app'));
 });
+
+
+gulp.task('copy2', function () {
+  return gulp.src( [ 'bower_components/**/*' ] )
+    .pipe(gulp.dest('dist/app/bower_components'));
+}); 
 
 gulp.task('browserify', function () {
   return browserify(o.jsx)
@@ -104,7 +110,7 @@ gulp.task('release', ['browserify'], function () {
 });
 
 gulp.task('watch', ['clean'], function () {
-  gulp.start(['browserifyDev', 'copy', 'styles', 'browserSync', 'electron']);
+  gulp.start(['browserifyDev', 'copy', 'copy2', 'styles', 'browserSync', 'electron']);
 });
 
 gulp.task('build', ['clean'], function () {
@@ -116,3 +122,21 @@ gulp.task('default', function () {
   console.log('Run `gulp watch` or `gulp build`');
 });
 
+
+/*
+var plugins = require("gulp-load-plugins")({
+	pattern: ['gulp-*', 'gulp.*', 'main-bower-files'],
+	replaceString: /\bgulp[\-.]/
+});
+ // Define default destination folder
+var dest = 'dest/app/';
+
+gulp.task('js', function() {
+ 	var jsFiles = ['app/*.js'];
+ 	gulp.src(plugins.mainBowerFiles().concat(jsFiles))
+		.pipe(plugins.filter('*.js'))
+		.pipe(plugins.concat('main.js'))
+		.pipe(plugins.uglify())
+		.pipe(gulp.dest(dest + 'js'));
+});
+*/

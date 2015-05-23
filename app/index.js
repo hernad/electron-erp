@@ -12,11 +12,11 @@ require('crash-reporter').start();
 const http = require('http');
 const fs = require('fs');
 
-const termSocketio = require('socket.io');
 const child_pty = require('child_pty');
 const ss = require('socket.io-stream');
 
-var termServer = http.createServer().listen( 3000 , '127.0.0.1');
+const termServer = http.createServer().listen( 3000, '127.0.0.1' );
+const termSocketio = require('socket.io')(termServer);
 var ptys = {};
 var termId = 1;
 
@@ -76,6 +76,7 @@ ttyApp.get('/foo', function(req, res, next) {
 ttyApp.listen();
 */
 
+/*
 ipc.on('asynchronous-message', function(event, arg) {
   console.log(arg);  // prints "ping"
   event.sender.send('asynchronous-reply', 'pong');
@@ -85,7 +86,7 @@ ipc.on('synchronous-message', function(event, arg) {
   console.log(arg);  // prints "ping"
   event.returnValue = 'pong';
 });
-
+*/
 
 app.on('ready', function () {
 
@@ -392,7 +393,7 @@ app.on('ready', function () {
 
   termServer.on('request', function(req, res) {
 		var file = null;
-		console.log(req.url);
+		console.log( "REQUEST:", req.url);
 		switch(req.url) {
 		case '/':
 		case '/terminal.html':
@@ -408,32 +409,57 @@ app.on('ready', function () {
 			file = '/socket.io-stream.js';
 			break;
 		default:
-			res.writeHead(404, {'Content-Type': 'text/plain'});
-			res.end('404 Not Found');
-			return;
+			//res.writeHead(404, {'Content-Type': 'text/plain'});
+			//res.end('404 Not Found');
+			//return;
+                        file = req.url;
+                        break;
 		}
-                console.log( "dirname:", __dirname );
-		fs.createReadStream(__dirname + file).pipe(res);
+
+                if ( file.search(/pooling/) > 0 ) {
+                      console.log( '!ovo je socket io request', file ); 
+		      res.writeHead(404, {'Content-Type': 'text/plain'});
+		      res.end('404 Not Found');
+                      return;
+                } else {
+                  console.log( "dirname:", __dirname );
+		  fs.createReadStream(__dirname + file).pipe(res);
+                }
 	});
 
-   termSocketio(termServer).of('pty').on('connection', function(socket) {
-	// receives a bidirectional pipe from the client see index.html
+    termSocketio.of('pty').on('connection', function(socket) {
+	
+        // receives a bidirectional pipe from the client see index.html
 	// for the client-side
-	ss(socket).on('new', function(stream, options) {
+        var cmd = "echo \"Hello from electron-erp web terminal\"; /bin/bash";
+        var pty; 
+	
+        ss(socket).on('new', function(stream, options) {
 		var name = options.name;
-                var cmd = "echo \"Hello from electron-erp web terminal\"; ./test"
 
+                pty = child_pty.spawn('/bin/sh', ['-c', cmd ], options);
                 console.log( "terminal options:", options );
-		var pty = child_pty.spawn('/bin/sh', ['-c', cmd ], options);
 		pty.stdout.pipe(stream).pipe(pty.stdin);
 		ptys[name] = pty;
+
 		socket.on('disconnect', function() {
 			console.log("socket disconnect: end");
 			pty.kill('SIGHUP');
 			delete ptys[name];
 		});
 	});
-});
+
+/* 
+        ss(socket).on('field01', function(stream, data) {
+            //console.log( 'field01', stream, data );
+            pty.stdout.pipe(stream).pipe(pty.stdin);
+        });
+
+*/
+
+      //});
+
+   });
 
 
 
